@@ -117,6 +117,11 @@
   gap: 0.8rem;
 }
 
+.grid > *,
+.partida > * {
+  min-width: 0;
+}
+
 .full {
   grid-column: span 2;
 }
@@ -144,6 +149,13 @@ button {
   border: 1px solid rgba(148, 163, 184, 0.35);
   border-radius: 10px;
   font-size: 0.95rem;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  max-width: 100%;
 }
 
 input,
@@ -238,7 +250,7 @@ button:disabled {
 
 .partida {
   display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr 1fr auto auto;
+  grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr)) auto auto;
   gap: 0.55rem;
   align-items: end;
   margin-bottom: 0.7rem;
@@ -246,6 +258,11 @@ button:disabled {
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.78);
   border: 1px solid rgba(147, 197, 253, 0.45);
+}
+
+.partida button,
+.actions-row button {
+  width: auto;
 }
 
 .total {
@@ -296,7 +313,12 @@ button:disabled {
   }
 
   .partida {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
+  }
+
+  .total,
+  .capitulo-total {
+    text-align: left;
   }
 
   .top-bar {
