@@ -1,34 +1,40 @@
 # Front Presupuesto Obras (Angular)
 
-Aplicación Angular para crear presupuestos de obra con capítulos y partidas.
+Aplicación Angular para gestionar presupuestos de obra por usuario.
 
-## Funcionalidad
+## Flujo funcional
 
-- Crear un presupuesto nuevo con nombre y descripción.
-- Añadir capítulos con:
-  - nombre,
-  - referencia/número,
-  - descripción.
-- Añadir partidas por capítulo con:
-  - descripción,
-  - unidad de medida,
-  - cantidad,
-  - precio,
-  - total automático (cantidad x precio).
-- Cálculo automático de totales por capítulo y total general del presupuesto.
-- Envío del presupuesto al backend (`POST /api/presupuestos`).
+1. Inicio de sesión para recuperar presupuestos del usuario.
+2. Home con listado de presupuestos del usuario autenticado.
+3. Apertura de un presupuesto existente para seguir editándolo.
+4. Creación de un presupuesto nuevo.
+5. Edición de capítulos y partidas con cálculo automático de totales.
+
+## Estructura de presupuesto
+
+- Presupuesto: nombre, descripción y total.
+- Capítulo: nombre, referencia/número, descripción y total.
+- Partida: descripción, unidad de medida, cantidad, precio y total (`cantidad x precio`).
+
+## Endpoints esperados de backend
+
+Con `apiBaseUrl` configurado en `src/environments/environment.ts`:
+
+- `POST /auth/login`
+- `GET /presupuestos/mis`
+- `GET /presupuestos/:id`
+- `POST /presupuestos`
+- `PUT /presupuestos/:id`
 
 ## Configuración del backend
 
-La URL del backend está en:
+Archivo:
 
 `src/environments/environment.ts`
 
 ```ts
 apiBaseUrl: 'http://localhost:3000/api'
 ```
-
-Ajústala según tu backend de presupuestos de obra.
 
 ## Scripts
 

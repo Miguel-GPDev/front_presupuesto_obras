@@ -2,7 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PresupuestoService } from './presupuesto.service';
-import { Capitulo, Partida, Presupuesto } from './presupuesto.models';
+import { Capitulo, LoginResponse, Partida, Presupuesto } from './presupuesto.models';
+
+type Vista = 'login' | 'home' | 'editor';
 
 @Component({
   selector: 'app-root',
@@ -12,9 +14,23 @@ import { Capitulo, Partida, Presupuesto } from './presupuesto.models';
   styleUrl: './app.component.css'
 })
 export class AppComponent {
+  readonly vista = signal<Vista>('login');
+  readonly token = signal('');
+  readonly usuarioNombre = signal('');
+  readonly presupuestoActualId = signal<string | null>(null);
+
+  readonly cargando = signal(false);
   readonly guardando = signal(false);
   readonly mensaje = signal('');
   readonly error = signal('');
+  readonly loginError = signal('');
+
+  readonly presupuestos = signal<Presupuesto[]>([]);
+
+  readonly loginForm = this.fb.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required]]
+  });
 
   readonly form = this.fb.group({
     nombre: ['', [Validators.required]],
@@ -37,9 +53,7 @@ export class AppComponent {
   constructor(
     private readonly fb: FormBuilder,
     private readonly presupuestoService: PresupuestoService
-  ) {
-    this.agregarCapitulo();
-  }
+  ) {}
 
   get capitulos(): FormArray<FormGroup> {
     return this.form.get('capitulos') as FormArray<FormGroup>;
@@ -47,6 +61,101 @@ export class AppComponent {
 
   partidas(indexCapitulo: number): FormArray<FormGroup> {
     return this.capitulos.at(indexCapitulo).get('partidas') as FormArray<FormGroup>;
+  }
+
+  iniciarSesion(): void {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
+
+    this.cargando.set(true);
+    this.loginError.set('');
+    this.error.set('');
+
+    this.presupuestoService
+      .login({
+        email: this.loginForm.value.email ?? '',
+        password: this.loginForm.value.password ?? ''
+      })
+      .subscribe({
+        next: (respuesta: LoginResponse) => {
+          this.token.set(respuesta.token);
+          this.usuarioNombre.set(respuesta.usuario.nombre);
+          this.vista.set('home');
+          this.cargando.set(false);
+          this.cargarPresupuestos();
+        },
+        error: () => {
+          this.loginError.set('No se pudo iniciar sesión. Verifica credenciales.');
+          this.cargando.set(false);
+        }
+      });
+  }
+
+  cerrarSesion(): void {
+    this.token.set('');
+    this.usuarioNombre.set('');
+    this.presupuestos.set([]);
+    this.presupuestoActualId.set(null);
+    this.vista.set('login');
+    this.loginForm.reset();
+    this.reiniciarFormularioPresupuesto();
+  }
+
+  cargarPresupuestos(): void {
+    if (!this.token()) {
+      return;
+    }
+
+    this.cargando.set(true);
+    this.error.set('');
+
+    this.presupuestoService.obtenerPresupuestosUsuario(this.token()).subscribe({
+      next: (lista) => {
+        this.presupuestos.set(lista);
+        this.cargando.set(false);
+      },
+      error: () => {
+        this.error.set('No se pudo recuperar la lista de presupuestos.');
+        this.cargando.set(false);
+      }
+    });
+  }
+
+  nuevoPresupuesto(): void {
+    this.presupuestoActualId.set(null);
+    this.reiniciarFormularioPresupuesto();
+    this.vista.set('editor');
+  }
+
+  abrirPresupuesto(id: string): void {
+    if (!this.token()) {
+      return;
+    }
+
+    this.cargando.set(true);
+    this.error.set('');
+
+    this.presupuestoService.obtenerPresupuesto(id, this.token()).subscribe({
+      next: (presupuesto) => {
+        this.presupuestoActualId.set(presupuesto.id ?? id);
+        this.cargarFormularioDesdePresupuesto(presupuesto);
+        this.vista.set('editor');
+        this.cargando.set(false);
+      },
+      error: () => {
+        this.error.set('No se pudo abrir el presupuesto seleccionado.');
+        this.cargando.set(false);
+      }
+    });
+  }
+
+  volverAHome(): void {
+    this.vista.set('home');
+    this.mensaje.set('');
+    this.error.set('');
+    this.cargarPresupuestos();
   }
 
   agregarCapitulo(): void {
@@ -93,12 +202,18 @@ export class AppComponent {
   }
 
   guardar(): void {
+    if (!this.token()) {
+      this.error.set('Debes iniciar sesión para guardar.');
+      return;
+    }
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
     const payload: Presupuesto = {
+      id: this.presupuestoActualId() ?? undefined,
       nombre: this.form.value.nombre ?? '',
       descripcion: this.form.value.descripcion ?? '',
       capitulos: this.capitulos.controls.map((capituloForm, indexCapitulo): Capitulo => ({
@@ -121,9 +236,16 @@ export class AppComponent {
     this.mensaje.set('');
     this.error.set('');
 
-    this.presupuestoService.crearPresupuesto(payload).subscribe({
-      next: () => {
-        this.mensaje.set('Presupuesto creado correctamente.');
+    const peticion = this.presupuestoActualId()
+      ? this.presupuestoService.actualizarPresupuesto(this.presupuestoActualId() as string, payload, this.token())
+      : this.presupuestoService.crearPresupuesto(payload, this.token());
+
+    peticion.subscribe({
+      next: (resultado) => {
+        if (!this.presupuestoActualId() && resultado.id) {
+          this.presupuestoActualId.set(resultado.id);
+        }
+        this.mensaje.set('Presupuesto guardado correctamente.');
         this.guardando.set(false);
       },
       error: () => {
@@ -133,12 +255,64 @@ export class AppComponent {
     });
   }
 
-  private crearPartida(): FormGroup {
-    return this.fb.group({
-      descripcion: ['', Validators.required],
-      unidadMedida: ['', Validators.required],
-      cantidad: [0, [Validators.required, Validators.min(0)]],
-      precio: [0, [Validators.required, Validators.min(0)]]
+  private reiniciarFormularioPresupuesto(): void {
+    this.form.reset({ nombre: '', descripcion: '' });
+    this.capitulos.clear();
+    this.agregarCapitulo();
+  }
+
+  private cargarFormularioDesdePresupuesto(presupuesto: Presupuesto): void {
+    this.form.patchValue({
+      nombre: presupuesto.nombre,
+      descripcion: presupuesto.descripcion
     });
+
+    this.capitulos.clear();
+
+    if (!presupuesto.capitulos.length) {
+      this.agregarCapitulo();
+      return;
+    }
+
+    presupuesto.capitulos.forEach((capitulo) => {
+      this.capitulos.push(
+        this.fb.group({
+          nombre: [capitulo.nombre, Validators.required],
+          referencia: [capitulo.referencia, Validators.required],
+          descripcion: [capitulo.descripcion],
+          partidas: this.fb.array(
+            (capitulo.partidas.length ? capitulo.partidas : [this.partidaVacia()]).map((partida) =>
+              this.fb.group({
+                descripcion: [partida.descripcion, Validators.required],
+                unidadMedida: [partida.unidadMedida, Validators.required],
+                cantidad: [partida.cantidad, [Validators.required, Validators.min(0)]],
+                precio: [partida.precio, [Validators.required, Validators.min(0)]]
+              })
+            )
+          )
+        })
+      );
+    });
+  }
+
+  private crearPartida(): FormGroup {
+    const partida = this.partidaVacia();
+
+    return this.fb.group({
+      descripcion: [partida.descripcion, Validators.required],
+      unidadMedida: [partida.unidadMedida, Validators.required],
+      cantidad: [partida.cantidad, [Validators.required, Validators.min(0)]],
+      precio: [partida.precio, [Validators.required, Validators.min(0)]]
+    });
+  }
+
+  private partidaVacia(): Partida {
+    return {
+      descripcion: '',
+      unidadMedida: '',
+      cantidad: 0,
+      precio: 0,
+      total: 0
+    };
   }
 }

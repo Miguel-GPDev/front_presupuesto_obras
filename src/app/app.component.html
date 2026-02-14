@@ -1,87 +1,145 @@
 <main class="container">
-  <h1>Nuevo presupuesto de obra</h1>
+  <header class="top-bar">
+    <h1>Presupuestos de obra</h1>
+    <button *ngIf="vista() !== 'login'" type="button" (click)="cerrarSesion()">Cerrar sesión</button>
+  </header>
 
-  <form [formGroup]="form" (ngSubmit)="guardar()">
-    <section class="panel">
-      <h2>Datos generales</h2>
-      <div class="grid">
-        <label>
-          Nombre del presupuesto
-          <input formControlName="nombre" placeholder="Ej. Reforma de vivienda" />
-        </label>
-        <label>
-          Descripción
-          <textarea formControlName="descripcion" rows="3"></textarea>
-        </label>
+  <section *ngIf="vista() === 'login'" class="panel login-panel">
+    <h2>Iniciar sesión</h2>
+    <form [formGroup]="loginForm" (ngSubmit)="iniciarSesion()" class="login-form">
+      <label>
+        Email
+        <input type="email" formControlName="email" placeholder="usuario@empresa.com" />
+      </label>
+      <label>
+        Contraseña
+        <input type="password" formControlName="password" placeholder="********" />
+      </label>
+      <button type="submit" [disabled]="cargando()">{{ cargando() ? 'Entrando...' : 'Entrar' }}</button>
+    </form>
+    <p class="error" *ngIf="loginError()">{{ loginError() }}</p>
+  </section>
+
+  <section *ngIf="vista() === 'home'" class="panel">
+    <div class="section-title">
+      <div>
+        <h2>Mis presupuestos</h2>
+        <p class="muted">Usuario: {{ usuarioNombre() }}</p>
       </div>
-    </section>
+      <button type="button" (click)="nuevoPresupuesto()">+ Nuevo presupuesto</button>
+    </div>
 
-    <section class="panel" formArrayName="capitulos">
-      <div class="section-title">
-        <h2>Capítulos</h2>
-        <button type="button" (click)="agregarCapitulo()">+ Añadir capítulo</button>
-      </div>
+    <button type="button" class="ghost" (click)="cargarPresupuestos()" [disabled]="cargando()">
+      {{ cargando() ? 'Actualizando...' : 'Actualizar lista' }}
+    </button>
 
-      <article class="capitulo" *ngFor="let capitulo of capitulos.controls; let i = index" [formGroupName]="i">
-        <div class="section-title">
-          <h3>Capítulo {{ i + 1 }}</h3>
-          <button type="button" class="danger" (click)="eliminarCapitulo(i)">Eliminar capítulo</button>
-        </div>
+    <ul class="lista-presupuestos" *ngIf="presupuestos().length; else vacio">
+      <li *ngFor="let presupuesto of presupuestos()">
+        <button type="button" class="item" (click)="abrirPresupuesto(presupuesto.id ?? '')">
+          <div>
+            <strong>{{ presupuesto.nombre }}</strong>
+            <p>{{ presupuesto.descripcion || 'Sin descripción' }}</p>
+          </div>
+          <span>{{ presupuesto.total | number:'1.2-2' }} €</span>
+        </button>
+      </li>
+    </ul>
 
+    <ng-template #vacio>
+      <p class="muted">No tienes presupuestos todavía. Crea el primero.</p>
+    </ng-template>
+  </section>
+
+  <section *ngIf="vista() === 'editor'" class="panel">
+    <div class="section-title">
+      <h2>{{ presupuestoActualId() ? 'Editar presupuesto' : 'Nuevo presupuesto' }}</h2>
+      <button type="button" class="ghost" (click)="volverAHome()">← Volver a la lista</button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      <section class="panel nested">
+        <h3>Datos generales</h3>
         <div class="grid">
           <label>
-            Nombre
-            <input formControlName="nombre" />
+            Nombre del presupuesto
+            <input formControlName="nombre" placeholder="Ej. Reforma de vivienda" />
           </label>
           <label>
-            Referencia / Nº
-            <input formControlName="referencia" />
-          </label>
-          <label class="full">
             Descripción
-            <textarea formControlName="descripcion" rows="2"></textarea>
+            <textarea formControlName="descripcion" rows="3"></textarea>
           </label>
         </div>
+      </section>
 
-        <div formArrayName="partidas" class="partidas">
-          <div class="section-title small">
-            <h4>Partidas</h4>
-            <button type="button" (click)="agregarPartida(i)">+ Añadir partida</button>
-          </div>
-
-          <div class="partida" *ngFor="let partida of partidas(i).controls; let j = index" [formGroupName]="j">
-            <label>
-              Descripción
-              <input formControlName="descripcion" />
-            </label>
-            <label>
-              Unidad
-              <input formControlName="unidadMedida" />
-            </label>
-            <label>
-              Cantidad
-              <input type="number" formControlName="cantidad" min="0" step="0.01" />
-            </label>
-            <label>
-              Precio
-              <input type="number" formControlName="precio" min="0" step="0.01" />
-            </label>
-            <div class="total">Total: {{ totalPartida(i, j) | number:'1.2-2' }} €</div>
-            <button type="button" class="danger" (click)="eliminarPartida(i, j)">Eliminar</button>
-          </div>
+      <section class="panel nested" formArrayName="capitulos">
+        <div class="section-title">
+          <h3>Capítulos</h3>
+          <button type="button" (click)="agregarCapitulo()">+ Añadir capítulo</button>
         </div>
 
-        <p class="capitulo-total">Total capítulo: {{ totalCapitulo(i) | number:'1.2-2' }} €</p>
-      </article>
-    </section>
+        <article class="capitulo" *ngFor="let capitulo of capitulos.controls; let i = index" [formGroupName]="i">
+          <div class="section-title">
+            <h4>Capítulo {{ i + 1 }}</h4>
+            <button type="button" class="danger" (click)="eliminarCapitulo(i)">Eliminar capítulo</button>
+          </div>
 
-    <section class="panel footer">
-      <h2>Total presupuesto: {{ totalGeneral() | number:'1.2-2' }} €</h2>
-      <button type="submit" [disabled]="guardando()">
-        {{ guardando() ? 'Guardando...' : 'Guardar presupuesto' }}
-      </button>
-      <p class="ok" *ngIf="mensaje()">{{ mensaje() }}</p>
-      <p class="error" *ngIf="error()">{{ error() }}</p>
-    </section>
-  </form>
+          <div class="grid">
+            <label>
+              Nombre
+              <input formControlName="nombre" />
+            </label>
+            <label>
+              Referencia / Nº
+              <input formControlName="referencia" />
+            </label>
+            <label class="full">
+              Descripción
+              <textarea formControlName="descripcion" rows="2"></textarea>
+            </label>
+          </div>
+
+          <div formArrayName="partidas" class="partidas">
+            <div class="section-title small">
+              <h5>Partidas</h5>
+              <button type="button" (click)="agregarPartida(i)">+ Añadir partida</button>
+            </div>
+
+            <div class="partida" *ngFor="let partida of partidas(i).controls; let j = index" [formGroupName]="j">
+              <label>
+                Descripción
+                <input formControlName="descripcion" />
+              </label>
+              <label>
+                Unidad
+                <input formControlName="unidadMedida" />
+              </label>
+              <label>
+                Cantidad
+                <input type="number" formControlName="cantidad" min="0" step="0.01" />
+              </label>
+              <label>
+                Precio
+                <input type="number" formControlName="precio" min="0" step="0.01" />
+              </label>
+              <div class="total">Total: {{ totalPartida(i, j) | number:'1.2-2' }} €</div>
+              <button type="button" class="danger" (click)="eliminarPartida(i, j)">Eliminar</button>
+            </div>
+          </div>
+
+          <p class="capitulo-total">Total capítulo: {{ totalCapitulo(i) | number:'1.2-2' }} €</p>
+        </article>
+      </section>
+
+      <section class="panel nested footer">
+        <h3>Total presupuesto: {{ totalGeneral() | number:'1.2-2' }} €</h3>
+        <button type="submit" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando...' : 'Guardar presupuesto' }}
+        </button>
+        <p class="ok" *ngIf="mensaje()">{{ mensaje() }}</p>
+        <p class="error" *ngIf="error()">{{ error() }}</p>
+      </section>
+    </form>
+  </section>
+
+  <p class="error" *ngIf="error() && vista() === 'home'">{{ error() }}</p>
 </main>
