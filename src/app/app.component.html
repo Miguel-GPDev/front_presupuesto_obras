@@ -226,7 +226,14 @@
       </section>
 
       <section class="panel nested footer">
-        <h3>Total presupuesto: {{ totalGeneral() | number:'1.2-2' }} €</h3>
+        <h3>Total presupuesto (sin IVA): {{ totalGeneral() | number:'1.2-2' }} €</h3>
+
+        <label class="iva-field">
+          IVA (%)
+          <input type="number" formControlName="ivaPorcentaje" min="0" max="100" step="0.01" />
+        </label>
+
+        <h3>Total presupuesto (con IVA): {{ totalConIva() | number:'1.2-2' }} €</h3>
 
         <div class="actions-row">
           <button type="button" class="ghost" (click)="previsualizarPdf()">Previsualizar PDF</button>
@@ -302,7 +309,7 @@
     </section>
 
     <footer class="preview-footer">
-      <strong>Total presupuesto: {{ totalGeneral() | number:'1.2-2' }} €</strong>
+      <strong>Total presupuesto (sin IVA): {{ totalGeneral() | number:'1.2-2' }} € · IVA {{ form.value.ivaPorcentaje || 0 }}% · Total con IVA: {{ totalConIva() | number:'1.2-2' }} €</strong>
       <button type="button" (click)="cerrarPreview()">Cerrar vista previa</button>
     </footer>
   </article>

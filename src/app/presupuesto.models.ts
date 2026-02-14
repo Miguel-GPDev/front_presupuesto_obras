@@ -24,6 +24,8 @@ export interface Presupuesto {
   cliente: Cliente;
   capitulos: Capitulo[];
   total: number;
+  ivaPorcentaje?: number;
+  totalConIva?: number;
 }
 
 

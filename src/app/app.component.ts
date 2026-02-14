@@ -60,6 +60,7 @@ export class AppComponent {
       telefono: [''],
       direccion: ['']
     }),
+    ivaPorcentaje: [21, [Validators.min(0), Validators.max(100)]],
     capitulos: this.fb.array([])
   });
 
@@ -74,6 +75,12 @@ export class AppComponent {
       return acumulado + totalCapitulo;
     }, 0)
   );
+
+
+  readonly totalConIva = computed(() => {
+    const iva = Number(this.form.value.ivaPorcentaje ?? 0);
+    return this.totalGeneral() * (1 + iva / 100);
+  });
 
 
   readonly opcionesUnidad = [
@@ -381,7 +388,9 @@ export class AppComponent {
         })),
         total: this.totalCapitulo(indexCapitulo)
       })),
-      total: this.totalGeneral()
+      total: this.totalGeneral(),
+      ivaPorcentaje: Number(this.form.value.ivaPorcentaje ?? 0),
+      totalConIva: this.totalConIva()
     };
 
     this.guardando.set(true);
@@ -421,7 +430,8 @@ export class AppComponent {
       nombre: '',
       descripcion: '',
       empresa: { nombre: '', nif: '', email: '', telefono: '', direccion: '', logo: '' },
-      cliente: { nombre: '', nif: '', email: '', telefono: '', direccion: '' }
+      cliente: { nombre: '', nif: '', email: '', telefono: '', direccion: '' },
+      ivaPorcentaje: 21
     });
     this.capitulos.clear();
     this.agregarCapitulo();
@@ -432,7 +442,8 @@ export class AppComponent {
       nombre: presupuesto.nombre,
       descripcion: presupuesto.descripcion,
       empresa: presupuesto.empresa ?? { nombre: '', nif: '', email: '', telefono: '', direccion: '', logo: '' },
-      cliente: presupuesto.cliente ?? { nombre: '', nif: '', email: '', telefono: '', direccion: '' }
+      cliente: presupuesto.cliente ?? { nombre: '', nif: '', email: '', telefono: '', direccion: '' },
+      ivaPorcentaje: Number(presupuesto.ivaPorcentaje ?? 21)
     });
 
     this.capitulos.clear();

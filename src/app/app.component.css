@@ -284,6 +284,10 @@ button:disabled {
   gap: 0.8rem;
 }
 
+.iva-field {
+  max-width: 220px;
+}
+
 .danger {
   background: linear-gradient(120deg, rgba(254, 226, 226, 0.95), rgba(254, 202, 202, 0.85));
   border-color: rgba(239, 68, 68, 0.35);
