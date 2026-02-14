@@ -33,6 +33,7 @@ export interface EmpresaEmisora {
   email: string;
   telefono: string;
   direccion: string;
+  logo?: string;
 }
 
 export interface Cliente {

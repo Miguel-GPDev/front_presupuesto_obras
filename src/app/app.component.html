@@ -102,9 +102,18 @@
         </div>
       </section>
 
-
       <section class="panel nested" formGroupName="empresa">
         <h3>Empresa emisora</h3>
+
+        <div class="logo-block">
+          <input #logoInput type="file" accept="image/*" hidden (change)="onLogoSeleccionado($event)" />
+          <button type="button" class="logo-circle" (click)="logoInput.click()" aria-label="Añadir logo">+</button>
+          <div class="logo-preview" *ngIf="logoEmpresa()">
+            <img [src]="logoEmpresa()" alt="Logo empresa" />
+          </div>
+          <p class="muted">Añade el logo de la empresa (opcional).</p>
+        </div>
+
         <div class="grid company-grid">
           <label>
             Nombre empresa
@@ -216,9 +225,14 @@
 
       <section class="panel nested footer">
         <h3>Total presupuesto: {{ totalGeneral() | number:'1.2-2' }} €</h3>
-        <button type="submit" [disabled]="guardando()">
-          {{ guardando() ? 'Guardando...' : (estaAutenticado() ? 'Guardar y enviar' : 'Guardar borrador local') }}
-        </button>
+
+        <div class="actions-row">
+          <button type="button" class="ghost" (click)="previsualizarPdf()">Previsualizar PDF</button>
+          <button type="submit" [disabled]="guardando()">
+            {{ guardando() ? 'Guardando...' : (estaAutenticado() ? 'Guardar y enviar' : 'Guardar borrador local') }}
+          </button>
+        </div>
+
         <p class="ok" *ngIf="mensaje()">{{ mensaje() }}</p>
         <p class="error" *ngIf="error()">{{ error() }}</p>
       </section>
@@ -227,3 +241,67 @@
 
   <p class="error" *ngIf="error() && vista() === 'home'">{{ error() }}</p>
 </main>
+
+<section class="preview-modal" *ngIf="mostrandoPreview()">
+  <article class="preview-sheet">
+    <header class="preview-head">
+      <div>
+        <h2>{{ form.value.nombre || 'Vista previa de presupuesto' }}</h2>
+        <p>{{ form.value.descripcion || 'Sin descripción' }}</p>
+      </div>
+      <img *ngIf="logoEmpresa()" [src]="logoEmpresa()" alt="Logo empresa" class="preview-logo" />
+    </header>
+
+    <div class="preview-grid">
+      <section>
+        <h3>Empresa emisora</h3>
+        <p><strong>{{ form.value.empresa?.nombre || '-' }}</strong></p>
+        <p>NIF: {{ form.value.empresa?.nif || '-' }}</p>
+        <p>Email: {{ form.value.empresa?.email || '-' }}</p>
+        <p>Tel: {{ form.value.empresa?.telefono || '-' }}</p>
+        <p>{{ form.value.empresa?.direccion || '-' }}</p>
+      </section>
+      <section>
+        <h3>Cliente</h3>
+        <p><strong>{{ form.value.cliente?.nombre || '-' }}</strong></p>
+        <p>NIF/DNI: {{ form.value.cliente?.nif || '-' }}</p>
+        <p>Email: {{ form.value.cliente?.email || '-' }}</p>
+        <p>Tel: {{ form.value.cliente?.telefono || '-' }}</p>
+        <p>{{ form.value.cliente?.direccion || '-' }}</p>
+      </section>
+    </div>
+
+    <section class="preview-capitulos" *ngFor="let capitulo of capitulos.controls; let i = index">
+      <h3>{{ capitulo.value.referencia }} - {{ capitulo.value.nombre }}</h3>
+      <p>{{ capitulo.value.descripcion }}</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Descripción</th>
+            <th>Unidad</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let partida of partidas(i).controls; let j = index">
+            <td>{{ partida.value.descripcion }}</td>
+            <td>{{ partida.value.unidadMedida }}</td>
+            <td>{{ partida.value.cantidad }}</td>
+            <td>{{ partida.value.precio | number:'1.2-2' }} €</td>
+            <td>{{ totalPartida(i, j) | number:'1.2-2' }} €</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="preview-total-cap">Total capítulo: {{ totalCapitulo(i) | number:'1.2-2' }} €</p>
+    </section>
+
+    <footer class="preview-footer">
+      <strong>Total presupuesto: {{ totalGeneral() | number:'1.2-2' }} €</strong>
+      <button type="button" (click)="cerrarPreview()">Cerrar vista previa</button>
+    </footer>
+  </article>
+</section>

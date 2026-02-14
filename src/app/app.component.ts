@@ -17,6 +17,7 @@ type AuthModo = 'login' | 'register';
 export class AppComponent {
   readonly vista = signal<Vista>('login');
   readonly authModo = signal<AuthModo>('login');
+  readonly mostrandoPreview = signal(false);
 
   readonly token = signal('');
   readonly usuarioNombre = signal('');
@@ -49,7 +50,8 @@ export class AppComponent {
       nif: [''],
       email: ['', Validators.email],
       telefono: [''],
-      direccion: ['']
+      direccion: [''],
+      logo: ['']
     }),
     cliente: this.fb.group({
       nombre: ['', Validators.required],
@@ -91,7 +93,6 @@ export class AppComponent {
     this.authError.set('');
   }
 
-
   probarRapido(): void {
     this.token.set('');
     this.usuarioNombre.set('Invitado');
@@ -105,6 +106,43 @@ export class AppComponent {
 
   estaAutenticado(): boolean {
     return Boolean(this.token());
+  }
+
+  logoEmpresa(): string {
+    return this.form.value.empresa?.logo ?? '';
+  }
+
+  onLogoSeleccionado(evento: Event): void {
+    const input = evento.target as HTMLInputElement;
+    const archivo = input.files?.[0];
+
+    if (!archivo) {
+      return;
+    }
+
+    if (!archivo.type.startsWith('image/')) {
+      this.error.set('El logo debe ser una imagen válida.');
+      return;
+    }
+
+    const lector = new FileReader();
+    lector.onload = () => {
+      const resultado = String(lector.result ?? '');
+      this.form.get('empresa.logo')?.setValue(resultado);
+      this.error.set('');
+    };
+    lector.readAsDataURL(archivo);
+  }
+
+  previsualizarPdf(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+    }
+    this.mostrandoPreview.set(true);
+  }
+
+  cerrarPreview(): void {
+    this.mostrandoPreview.set(false);
   }
 
   iniciarSesion(): void {
@@ -286,7 +324,8 @@ export class AppComponent {
         nif: this.form.value.empresa?.nif ?? '',
         email: this.form.value.empresa?.email ?? '',
         telefono: this.form.value.empresa?.telefono ?? '',
-        direccion: this.form.value.empresa?.direccion ?? ''
+        direccion: this.form.value.empresa?.direccion ?? '',
+        logo: this.form.value.empresa?.logo ?? ''
       } as EmpresaEmisora,
       cliente: {
         nombre: this.form.value.cliente?.nombre ?? '',
@@ -347,7 +386,7 @@ export class AppComponent {
     this.form.reset({
       nombre: '',
       descripcion: '',
-      empresa: { nombre: '', nif: '', email: '', telefono: '', direccion: '' },
+      empresa: { nombre: '', nif: '', email: '', telefono: '', direccion: '', logo: '' },
       cliente: { nombre: '', nif: '', email: '', telefono: '', direccion: '' }
     });
     this.capitulos.clear();
@@ -358,7 +397,7 @@ export class AppComponent {
     this.form.patchValue({
       nombre: presupuesto.nombre,
       descripcion: presupuesto.descripcion,
-      empresa: presupuesto.empresa ?? { nombre: '', nif: '', email: '', telefono: '', direccion: '' },
+      empresa: presupuesto.empresa ?? { nombre: '', nif: '', email: '', telefono: '', direccion: '', logo: '' },
       cliente: presupuesto.cliente ?? { nombre: '', nif: '', email: '', telefono: '', direccion: '' }
     });
 

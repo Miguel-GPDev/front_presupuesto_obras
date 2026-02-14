@@ -10,10 +10,11 @@ Aplicación Angular para gestionar presupuestos de obra por usuario.
 4. Apertura de un presupuesto existente para seguir editándolo.
 5. Creación de un presupuesto nuevo.
 6. Edición de capítulos y partidas con cálculo automático de totales.
+7. Carga de logo de empresa y previsualización tipo PDF antes de enviar.
 
 ## Estructura de presupuesto
 
-- Presupuesto: nombre, descripción, datos de empresa emisora, datos del cliente y total.
+- Presupuesto: nombre, descripción, datos de empresa emisora (incluyendo logo), datos del cliente y total.
 - Capítulo: nombre, referencia/número, descripción y total.
 - Partida: descripción, unidad de medida, cantidad, precio y total (`cantidad x precio`).
 

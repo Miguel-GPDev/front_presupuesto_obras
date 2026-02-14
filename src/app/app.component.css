@@ -306,3 +306,137 @@ button:disabled {
     padding: 1rem;
   }
 }
+
+.logo-block {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.9rem;
+}
+
+.logo-circle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  font-size: 1.7rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(130deg, #1e88ff, #8dd9ff);
+  color: #ffffff;
+}
+
+.logo-preview {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(30, 136, 255, 0.35);
+}
+
+.logo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.actions-row {
+  display: flex;
+  gap: 0.7rem;
+}
+
+.preview-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.5);
+  padding: 2rem;
+  overflow: auto;
+  z-index: 40;
+}
+
+.preview-sheet {
+  max-width: 980px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.2rem;
+  box-shadow: 0 24px 40px rgba(15, 23, 42, 0.25);
+}
+
+.preview-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.preview-head h2 {
+  margin: 0;
+}
+
+.preview-head p {
+  margin: 0.3rem 0 0;
+  color: #475569;
+}
+
+.preview-logo {
+  width: 74px;
+  height: 74px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.preview-grid section {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.7rem;
+}
+
+.preview-grid p {
+  margin: 0.2rem 0;
+}
+
+.preview-capitulos {
+  margin-top: 1rem;
+  border-top: 1px dashed #cbd5e1;
+  padding-top: 0.8rem;
+}
+
+.preview-capitulos table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+.preview-capitulos th,
+.preview-capitulos td {
+  border: 1px solid #e2e8f0;
+  padding: 0.4rem;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.preview-total-cap {
+  text-align: right;
+  font-weight: 700;
+}
+
+.preview-footer {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 0.8rem;
+}
