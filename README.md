@@ -4,11 +4,12 @@ Aplicación Angular para gestionar presupuestos de obra por usuario.
 
 ## Flujo funcional
 
-1. Inicio de sesión para recuperar presupuestos del usuario.
-2. Home con listado de presupuestos del usuario autenticado.
-3. Apertura de un presupuesto existente para seguir editándolo.
-4. Creación de un presupuesto nuevo.
-5. Edición de capítulos y partidas con cálculo automático de totales.
+1. Registro de usuario.
+2. Inicio de sesión para recuperar presupuestos del usuario.
+3. Home con listado de presupuestos del usuario autenticado.
+4. Apertura de un presupuesto existente para seguir editándolo.
+5. Creación de un presupuesto nuevo.
+6. Edición de capítulos y partidas con cálculo automático de totales.
 
 ## Estructura de presupuesto
 
@@ -20,6 +21,7 @@ Aplicación Angular para gestionar presupuestos de obra por usuario.
 
 Con `apiBaseUrl` configurado en `src/environments/environment.ts`:
 
+- `POST /auth/register`
 - `POST /auth/login`
 - `GET /presupuestos/mis`
 - `GET /presupuestos/:id`

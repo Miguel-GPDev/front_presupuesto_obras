@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
-import { LoginRequest, LoginResponse, Presupuesto } from './presupuesto.models';
+import { AuthResponse, LoginRequest, Presupuesto, RegisterRequest } from './presupuesto.models';
 
 @Injectable({ providedIn: 'root' })
 export class PresupuestoService {
@@ -10,8 +10,12 @@ export class PresupuestoService {
 
   constructor(private readonly http: HttpClient) {}
 
-  login(payload: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, payload);
+  login(payload: LoginRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, payload);
+  }
+
+  registro(payload: RegisterRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, payload);
   }
 
   crearPresupuesto(payload: Presupuesto, token: string): Observable<Presupuesto> {

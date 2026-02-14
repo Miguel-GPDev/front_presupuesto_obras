@@ -2,9 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PresupuestoService } from './presupuesto.service';
-import { Capitulo, LoginResponse, Partida, Presupuesto } from './presupuesto.models';
+import { AuthResponse, Capitulo, Partida, Presupuesto } from './presupuesto.models';
 
 type Vista = 'login' | 'home' | 'editor';
+type AuthModo = 'login' | 'register';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +16,8 @@ type Vista = 'login' | 'home' | 'editor';
 })
 export class AppComponent {
   readonly vista = signal<Vista>('login');
+  readonly authModo = signal<AuthModo>('login');
+
   readonly token = signal('');
   readonly usuarioNombre = signal('');
   readonly presupuestoActualId = signal<string | null>(null);
@@ -23,13 +26,19 @@ export class AppComponent {
   readonly guardando = signal(false);
   readonly mensaje = signal('');
   readonly error = signal('');
-  readonly loginError = signal('');
+  readonly authError = signal('');
 
   readonly presupuestos = signal<Presupuesto[]>([]);
 
   readonly loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]]
+  });
+
+  readonly registerForm = this.fb.group({
+    nombre: ['', [Validators.required]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]]
   });
 
   readonly form = this.fb.group({
@@ -63,6 +72,11 @@ export class AppComponent {
     return this.capitulos.at(indexCapitulo).get('partidas') as FormArray<FormGroup>;
   }
 
+  cambiarAuthModo(modo: AuthModo): void {
+    this.authModo.set(modo);
+    this.authError.set('');
+  }
+
   iniciarSesion(): void {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
@@ -70,7 +84,7 @@ export class AppComponent {
     }
 
     this.cargando.set(true);
-    this.loginError.set('');
+    this.authError.set('');
     this.error.set('');
 
     this.presupuestoService
@@ -79,15 +93,33 @@ export class AppComponent {
         password: this.loginForm.value.password ?? ''
       })
       .subscribe({
-        next: (respuesta: LoginResponse) => {
-          this.token.set(respuesta.token);
-          this.usuarioNombre.set(respuesta.usuario.nombre);
-          this.vista.set('home');
-          this.cargando.set(false);
-          this.cargarPresupuestos();
-        },
+        next: (respuesta) => this.onAuthOk(respuesta),
         error: () => {
-          this.loginError.set('No se pudo iniciar sesión. Verifica credenciales.');
+          this.authError.set('No se pudo iniciar sesión. Verifica credenciales.');
+          this.cargando.set(false);
+        }
+      });
+  }
+
+  registrarse(): void {
+    if (this.registerForm.invalid) {
+      this.registerForm.markAllAsTouched();
+      return;
+    }
+
+    this.cargando.set(true);
+    this.authError.set('');
+
+    this.presupuestoService
+      .registro({
+        nombre: this.registerForm.value.nombre ?? '',
+        email: this.registerForm.value.email ?? '',
+        password: this.registerForm.value.password ?? ''
+      })
+      .subscribe({
+        next: (respuesta) => this.onAuthOk(respuesta),
+        error: () => {
+          this.authError.set('No se pudo registrar el usuario. Revisa los datos e inténtalo de nuevo.');
           this.cargando.set(false);
         }
       });
@@ -99,7 +131,9 @@ export class AppComponent {
     this.presupuestos.set([]);
     this.presupuestoActualId.set(null);
     this.vista.set('login');
+    this.authModo.set('login');
     this.loginForm.reset();
+    this.registerForm.reset();
     this.reiniciarFormularioPresupuesto();
   }
 
@@ -130,7 +164,7 @@ export class AppComponent {
   }
 
   abrirPresupuesto(id: string): void {
-    if (!this.token()) {
+    if (!this.token() || !id) {
       return;
     }
 
@@ -253,6 +287,15 @@ export class AppComponent {
         this.guardando.set(false);
       }
     });
+  }
+
+  private onAuthOk(respuesta: AuthResponse): void {
+    this.token.set(respuesta.token);
+    this.usuarioNombre.set(respuesta.usuario.nombre);
+    this.vista.set('home');
+    this.authError.set('');
+    this.cargando.set(false);
+    this.cargarPresupuestos();
   }
 
   private reiniciarFormularioPresupuesto(): void {

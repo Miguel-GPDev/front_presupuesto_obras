@@ -5,8 +5,14 @@
   </header>
 
   <section *ngIf="vista() === 'login'" class="panel login-panel">
-    <h2>Iniciar sesión</h2>
-    <form [formGroup]="loginForm" (ngSubmit)="iniciarSesion()" class="login-form">
+    <h2>{{ authModo() === 'login' ? 'Iniciar sesión' : 'Crear cuenta' }}</h2>
+
+    <div class="auth-switch">
+      <button type="button" [class.active]="authModo() === 'login'" (click)="cambiarAuthModo('login')">Login</button>
+      <button type="button" [class.active]="authModo() === 'register'" (click)="cambiarAuthModo('register')">Registro</button>
+    </div>
+
+    <form *ngIf="authModo() === 'login'" [formGroup]="loginForm" (ngSubmit)="iniciarSesion()" class="login-form">
       <label>
         Email
         <input type="email" formControlName="email" placeholder="usuario@empresa.com" />
@@ -17,7 +23,24 @@
       </label>
       <button type="submit" [disabled]="cargando()">{{ cargando() ? 'Entrando...' : 'Entrar' }}</button>
     </form>
-    <p class="error" *ngIf="loginError()">{{ loginError() }}</p>
+
+    <form *ngIf="authModo() === 'register'" [formGroup]="registerForm" (ngSubmit)="registrarse()" class="login-form">
+      <label>
+        Nombre completo
+        <input type="text" formControlName="nombre" placeholder="Nombre Apellido" />
+      </label>
+      <label>
+        Email
+        <input type="email" formControlName="email" placeholder="usuario@empresa.com" />
+      </label>
+      <label>
+        Contraseña (mínimo 6 caracteres)
+        <input type="password" formControlName="password" placeholder="********" />
+      </label>
+      <button type="submit" [disabled]="cargando()">{{ cargando() ? 'Registrando...' : 'Registrarse' }}</button>
+    </form>
+
+    <p class="error" *ngIf="authError()">{{ authError() }}</p>
   </section>
 
   <section *ngIf="vista() === 'home'" class="panel">

@@ -29,7 +29,13 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface LoginResponse {
+export interface RegisterRequest {
+  nombre: string;
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
   token: string;
   usuario: {
     id: string;
