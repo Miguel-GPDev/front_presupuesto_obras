@@ -113,6 +113,13 @@ export class AppComponent {
     partida.get('precio')?.setValue(precioBase);
   }
 
+
+  autoResize(evento: Event): void {
+    const area = evento.target as HTMLTextAreaElement;
+    area.style.height = 'auto';
+    area.style.height = `${area.scrollHeight}px`;
+  }
+
   cambiarAuthModo(modo: AuthModo): void {
     this.authModo.set(modo);
     this.authError.set('');

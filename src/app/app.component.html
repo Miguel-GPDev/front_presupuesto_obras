@@ -198,9 +198,9 @@
             </div>
 
             <div class="partida" *ngFor="let partida of partidas(i).controls; let j = index" [formGroupName]="j">
-              <label>
+              <label class="descripcion-full">
                 Descripción
-                <input formControlName="descripcion" />
+                <textarea formControlName="descripcion" rows="1" (input)="autoResize($event)"></textarea>
               </label>
               <label>
                 Unidad de medida

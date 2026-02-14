@@ -238,7 +238,7 @@ button:disabled {
 
 .partida {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr auto auto;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr auto auto;
   gap: 0.55rem;
   align-items: end;
   margin-bottom: 0.7rem;
@@ -449,4 +449,15 @@ input[readonly] {
   background: #f1f5f9;
   color: #334155;
   cursor: not-allowed;
+}
+
+
+.descripcion-full {
+  grid-column: 1 / -1;
+}
+
+.descripcion-full textarea {
+  resize: none;
+  overflow: hidden;
+  min-height: 42px;
 }
