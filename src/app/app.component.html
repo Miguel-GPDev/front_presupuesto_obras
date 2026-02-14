@@ -1,0 +1,87 @@
+<main class="container">
+  <h1>Nuevo presupuesto de obra</h1>
+
+  <form [formGroup]="form" (ngSubmit)="guardar()">
+    <section class="panel">
+      <h2>Datos generales</h2>
+      <div class="grid">
+        <label>
+          Nombre del presupuesto
+          <input formControlName="nombre" placeholder="Ej. Reforma de vivienda" />
+        </label>
+        <label>
+          Descripción
+          <textarea formControlName="descripcion" rows="3"></textarea>
+        </label>
+      </div>
+    </section>
+
+    <section class="panel" formArrayName="capitulos">
+      <div class="section-title">
+        <h2>Capítulos</h2>
+        <button type="button" (click)="agregarCapitulo()">+ Añadir capítulo</button>
+      </div>
+
+      <article class="capitulo" *ngFor="let capitulo of capitulos.controls; let i = index" [formGroupName]="i">
+        <div class="section-title">
+          <h3>Capítulo {{ i + 1 }}</h3>
+          <button type="button" class="danger" (click)="eliminarCapitulo(i)">Eliminar capítulo</button>
+        </div>
+
+        <div class="grid">
+          <label>
+            Nombre
+            <input formControlName="nombre" />
+          </label>
+          <label>
+            Referencia / Nº
+            <input formControlName="referencia" />
+          </label>
+          <label class="full">
+            Descripción
+            <textarea formControlName="descripcion" rows="2"></textarea>
+          </label>
+        </div>
+
+        <div formArrayName="partidas" class="partidas">
+          <div class="section-title small">
+            <h4>Partidas</h4>
+            <button type="button" (click)="agregarPartida(i)">+ Añadir partida</button>
+          </div>
+
+          <div class="partida" *ngFor="let partida of partidas(i).controls; let j = index" [formGroupName]="j">
+            <label>
+              Descripción
+              <input formControlName="descripcion" />
+            </label>
+            <label>
+              Unidad
+              <input formControlName="unidadMedida" />
+            </label>
+            <label>
+              Cantidad
+              <input type="number" formControlName="cantidad" min="0" step="0.01" />
+            </label>
+            <label>
+              Precio
+              <input type="number" formControlName="precio" min="0" step="0.01" />
+            </label>
+            <div class="total">Total: {{ totalPartida(i, j) | number:'1.2-2' }} €</div>
+            <button type="button" class="danger" (click)="eliminarPartida(i, j)">Eliminar</button>
+          </div>
+        </div>
+
+        <p class="capitulo-total">Total capítulo: {{ totalCapitulo(i) | number:'1.2-2' }} €</p>
+      </article>
+    </section>
+
+    <section class="panel footer">
+      <h2>Total presupuesto: {{ totalGeneral() | number:'1.2-2' }} €</h2>
+      <button type="submit" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando...' : 'Guardar presupuesto' }}
+      </button>
+      <p class="ok" *ngIf="mensaje()">{{ mensaje() }}</p>
+      <p class="error" *ngIf="error()">{{ error() }}</p>
+    </section>
+  </form>
+</main>

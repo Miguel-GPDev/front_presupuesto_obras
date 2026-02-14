@@ -1,0 +1,106 @@
+:host {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #1f2937;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.panel {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: #fff;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.full {
+  grid-column: span 2;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+}
+
+input,
+textarea,
+button {
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+button {
+  cursor: pointer;
+}
+
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.section-title.small h4 {
+  margin: 0;
+}
+
+.capitulo {
+  border-top: 1px solid #f3f4f6;
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.partidas {
+  margin-top: 1rem;
+}
+
+.partida {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto auto;
+  gap: 0.5rem;
+  align-items: end;
+  margin-bottom: 0.7rem;
+}
+
+.total {
+  padding-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.capitulo-total {
+  text-align: right;
+  font-weight: bold;
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.8rem;
+}
+
+.danger {
+  background: #fee2e2;
+}
+
+.ok {
+  color: #166534;
+}
+
+.error {
+  color: #b91c1c;
+}
