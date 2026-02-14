@@ -138,6 +138,7 @@ label {
 
 input,
 textarea,
+select,
 button {
   padding: 0.62rem 0.7rem;
   border: 1px solid rgba(148, 163, 184, 0.35);
@@ -146,13 +147,15 @@ button {
 }
 
 input,
-textarea {
+textarea,
+select {
   background: rgba(255, 255, 255, 0.95);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 input:focus,
-textarea:focus {
+textarea:focus,
+select:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
@@ -439,4 +442,11 @@ button:disabled {
   align-items: center;
   border-top: 1px solid #e2e8f0;
   padding-top: 0.8rem;
+}
+
+
+input[readonly] {
+  background: #f1f5f9;
+  color: #334155;
+  cursor: not-allowed;
 }

@@ -75,6 +75,23 @@ export class AppComponent {
     }, 0)
   );
 
+
+  readonly opcionesUnidad = [
+    { valor: 'm2', etiqueta: 'Metros cuadrados (m²)', precioBase: 35 },
+    { valor: 'u', etiqueta: 'Unidades (u)', precioBase: 18 },
+    { valor: 'ml', etiqueta: 'Metros lineales (ml)', precioBase: 14 },
+    { valor: 'm3', etiqueta: 'Metros cúbicos (m³)', precioBase: 52 },
+    { valor: 'kg', etiqueta: 'Kilogramos (kg)', precioBase: 4.8 },
+    { valor: 'h', etiqueta: 'Horas (h)', precioBase: 28 },
+    { valor: 'l', etiqueta: 'Litros (l)', precioBase: 3.2 },
+    { valor: 'jor', etiqueta: 'Jornadas (jor)', precioBase: 180 }
+  ] as const;
+
+  private readonly precioBasePorUnidad: Record<string, number> = this.opcionesUnidad.reduce((acc, item) => {
+    acc[item.valor] = item.precioBase;
+    return acc;
+  }, {} as Record<string, number>);
+
   constructor(
     private readonly fb: FormBuilder,
     private readonly presupuestoService: PresupuestoService
@@ -86,6 +103,19 @@ export class AppComponent {
 
   partidas(indexCapitulo: number): FormArray<FormGroup> {
     return this.capitulos.at(indexCapitulo).get('partidas') as FormArray<FormGroup>;
+  }
+
+
+  precioUnitario(indexCapitulo: number, indexPartida: number): number {
+    const partida = this.partidas(indexCapitulo).at(indexPartida);
+    return Number(partida.get('precio')?.value ?? 0);
+  }
+
+  actualizarPrecioPorUnidad(indexCapitulo: number, indexPartida: number): void {
+    const partida = this.partidas(indexCapitulo).at(indexPartida);
+    const unidad = String(partida.get('unidadMedida')?.value ?? 'u');
+    const precioBase = this.precioBasePorUnidad[unidad] ?? 0;
+    partida.get('precio')?.setValue(precioBase);
   }
 
   cambiarAuthModo(modo: AuthModo): void {
@@ -269,6 +299,7 @@ export class AppComponent {
         partidas: this.fb.array([this.crearPartida()])
       })
     );
+    this.actualizarPrecioPorUnidad(this.capitulos.length - 1, 0);
   }
 
   eliminarCapitulo(indexCapitulo: number): void {
@@ -280,6 +311,7 @@ export class AppComponent {
 
   agregarPartida(indexCapitulo: number): void {
     this.partidas(indexCapitulo).push(this.crearPartida());
+    this.actualizarPrecioPorUnidad(indexCapitulo, this.partidas(indexCapitulo).length - 1);
   }
 
   eliminarPartida(indexCapitulo: number, indexPartida: number): void {
@@ -434,7 +466,7 @@ export class AppComponent {
 
     return this.fb.group({
       descripcion: [partida.descripcion, Validators.required],
-      unidadMedida: [partida.unidadMedida, Validators.required],
+      unidadMedida: [partida.unidadMedida || 'u', Validators.required],
       cantidad: [partida.cantidad, [Validators.required, Validators.min(0)]],
       precio: [partida.precio, [Validators.required, Validators.min(0)]]
     });
@@ -443,9 +475,9 @@ export class AppComponent {
   private partidaVacia(): Partida {
     return {
       descripcion: '',
-      unidadMedida: '',
+      unidadMedida: 'u',
       cantidad: 0,
-      precio: 0,
+      precio: this.precioBasePorUnidad['u'],
       total: 0
     };
   }

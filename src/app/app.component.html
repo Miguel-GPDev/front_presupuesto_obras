@@ -203,16 +203,18 @@
                 <input formControlName="descripcion" />
               </label>
               <label>
-                Unidad
-                <input formControlName="unidadMedida" />
+                Unidad de medida
+                <select formControlName="unidadMedida" (change)="actualizarPrecioPorUnidad(i, j)">
+                  <option *ngFor="let opcion of opcionesUnidad" [value]="opcion.valor">{{ opcion.etiqueta }}</option>
+                </select>
               </label>
               <label>
                 Cantidad
                 <input type="number" formControlName="cantidad" min="0" step="0.01" />
               </label>
               <label>
-                Precio
-                <input type="number" formControlName="precio" min="0" step="0.01" />
+                Precio unitario (auto)
+                <input type="number" [value]="precioUnitario(i, j)" readonly />
               </label>
               <div class="total">Total: {{ totalPartida(i, j) | number:'1.2-2' }} €</div>
               <button type="button" class="danger" (click)="eliminarPartida(i, j)">Eliminar</button>
