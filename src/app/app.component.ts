@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PresupuestoService } from './presupuesto.service';
-import { AuthResponse, Capitulo, Partida, Presupuesto } from './presupuesto.models';
+import { AuthResponse, Capitulo, Cliente, EmpresaEmisora, Partida, Presupuesto } from './presupuesto.models';
 
 type Vista = 'login' | 'home' | 'editor';
 type AuthModo = 'login' | 'register';
@@ -44,6 +44,20 @@ export class AppComponent {
   readonly form = this.fb.group({
     nombre: ['', [Validators.required]],
     descripcion: [''],
+    empresa: this.fb.group({
+      nombre: ['', Validators.required],
+      nif: [''],
+      email: ['', Validators.email],
+      telefono: [''],
+      direccion: ['']
+    }),
+    cliente: this.fb.group({
+      nombre: ['', Validators.required],
+      nif: [''],
+      email: ['', Validators.email],
+      telefono: [''],
+      direccion: ['']
+    }),
     capitulos: this.fb.array([])
   });
 
@@ -267,6 +281,20 @@ export class AppComponent {
       id: this.presupuestoActualId() ?? undefined,
       nombre: this.form.value.nombre ?? '',
       descripcion: this.form.value.descripcion ?? '',
+      empresa: {
+        nombre: this.form.value.empresa?.nombre ?? '',
+        nif: this.form.value.empresa?.nif ?? '',
+        email: this.form.value.empresa?.email ?? '',
+        telefono: this.form.value.empresa?.telefono ?? '',
+        direccion: this.form.value.empresa?.direccion ?? ''
+      } as EmpresaEmisora,
+      cliente: {
+        nombre: this.form.value.cliente?.nombre ?? '',
+        nif: this.form.value.cliente?.nif ?? '',
+        email: this.form.value.cliente?.email ?? '',
+        telefono: this.form.value.cliente?.telefono ?? '',
+        direccion: this.form.value.cliente?.direccion ?? ''
+      } as Cliente,
       capitulos: this.capitulos.controls.map((capituloForm, indexCapitulo): Capitulo => ({
         nombre: capituloForm.value.nombre ?? '',
         referencia: capituloForm.value.referencia ?? '',
@@ -316,7 +344,12 @@ export class AppComponent {
   }
 
   private reiniciarFormularioPresupuesto(): void {
-    this.form.reset({ nombre: '', descripcion: '' });
+    this.form.reset({
+      nombre: '',
+      descripcion: '',
+      empresa: { nombre: '', nif: '', email: '', telefono: '', direccion: '' },
+      cliente: { nombre: '', nif: '', email: '', telefono: '', direccion: '' }
+    });
     this.capitulos.clear();
     this.agregarCapitulo();
   }
@@ -324,7 +357,9 @@ export class AppComponent {
   private cargarFormularioDesdePresupuesto(presupuesto: Presupuesto): void {
     this.form.patchValue({
       nombre: presupuesto.nombre,
-      descripcion: presupuesto.descripcion
+      descripcion: presupuesto.descripcion,
+      empresa: presupuesto.empresa ?? { nombre: '', nif: '', email: '', telefono: '', direccion: '' },
+      cliente: presupuesto.cliente ?? { nombre: '', nif: '', email: '', telefono: '', direccion: '' }
     });
 
     this.capitulos.clear();

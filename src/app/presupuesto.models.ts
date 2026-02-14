@@ -20,8 +20,27 @@ export interface Presupuesto {
   id?: string;
   nombre: string;
   descripcion: string;
+  empresa: EmpresaEmisora;
+  cliente: Cliente;
   capitulos: Capitulo[];
   total: number;
+}
+
+
+export interface EmpresaEmisora {
+  nombre: string;
+  nif: string;
+  email: string;
+  telefono: string;
+  direccion: string;
+}
+
+export interface Cliente {
+  nombre: string;
+  nif: string;
+  email: string;
+  telefono: string;
+  direccion: string;
 }
 
 export interface LoginRequest {

@@ -121,6 +121,13 @@
   grid-column: span 2;
 }
 
+
+.company-grid {
+  background: rgba(255, 255, 255, 0.45);
+  padding: 0.65rem;
+  border-radius: 12px;
+}
+
 label {
   display: flex;
   flex-direction: column;

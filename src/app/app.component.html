@@ -102,6 +102,59 @@
         </div>
       </section>
 
+
+      <section class="panel nested" formGroupName="empresa">
+        <h3>Empresa emisora</h3>
+        <div class="grid company-grid">
+          <label>
+            Nombre empresa
+            <input formControlName="nombre" placeholder="Constructora Ejemplo S.L." />
+          </label>
+          <label>
+            NIF
+            <input formControlName="nif" placeholder="B12345678" />
+          </label>
+          <label>
+            Email
+            <input type="email" formControlName="email" placeholder="info@empresa.com" />
+          </label>
+          <label>
+            Teléfono
+            <input formControlName="telefono" placeholder="600 000 000" />
+          </label>
+          <label class="full">
+            Dirección
+            <input formControlName="direccion" placeholder="Calle, número, CP, ciudad" />
+          </label>
+        </div>
+      </section>
+
+      <section class="panel nested" formGroupName="cliente">
+        <h3>Datos del cliente</h3>
+        <div class="grid company-grid">
+          <label>
+            Nombre cliente
+            <input formControlName="nombre" placeholder="Cliente Ejemplo" />
+          </label>
+          <label>
+            NIF / DNI
+            <input formControlName="nif" placeholder="12345678A" />
+          </label>
+          <label>
+            Email
+            <input type="email" formControlName="email" placeholder="cliente@email.com" />
+          </label>
+          <label>
+            Teléfono
+            <input formControlName="telefono" placeholder="611 111 111" />
+          </label>
+          <label class="full">
+            Dirección
+            <input formControlName="direccion" placeholder="Calle, número, CP, ciudad" />
+          </label>
+        </div>
+      </section>
+
       <section class="panel nested" formArrayName="capitulos">
         <div class="section-title">
           <h3>Capítulos</h3>
