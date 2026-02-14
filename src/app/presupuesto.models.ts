@@ -1,4 +1,5 @@
 export interface Partida {
+  id?: string;
   descripcion: string;
   unidadMedida: string;
   cantidad: number;
@@ -7,6 +8,7 @@ export interface Partida {
 }
 
 export interface Capitulo {
+  id?: string;
   nombre: string;
   referencia: string;
   descripcion: string;
@@ -15,8 +17,29 @@ export interface Capitulo {
 }
 
 export interface Presupuesto {
+  id?: string;
   nombre: string;
   descripcion: string;
   capitulos: Capitulo[];
   total: number;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  nombre: string;
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  usuario: {
+    id: string;
+    nombre: string;
+    email: string;
+  };
 }
