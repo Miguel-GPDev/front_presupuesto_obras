@@ -106,11 +106,6 @@ export class AppComponent {
   }
 
 
-  precioUnitario(indexCapitulo: number, indexPartida: number): number {
-    const partida = this.partidas(indexCapitulo).at(indexPartida);
-    return Number(partida.get('precio')?.value ?? 0);
-  }
-
   actualizarPrecioPorUnidad(indexCapitulo: number, indexPartida: number): void {
     const partida = this.partidas(indexCapitulo).at(indexPartida);
     const unidad = String(partida.get('unidadMedida')?.value ?? 'u');
